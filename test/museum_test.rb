@@ -21,6 +21,7 @@ class MusuemTest < Minitest::Test
   def test_it_has_attributes
     assert_equal "Denver Museum of Nature and Science", @dmns.name
     assert_equal [], @dmns.exhibits
+    assert_equal [], @dmns.patrons
   end
 
   def test_it_can_add_exhibit
@@ -42,6 +43,34 @@ class MusuemTest < Minitest::Test
 
     assert_equal [@gems_and_minerals, @dead_sea_scrolls], @dmns.recommend_exhibits(@bob)
     assert_equal [@imax], @dmns.recommend_exhibits(@sally)
+  end
+
+  def test_it_can_admit_patrons
+    @dmns.admit(@bob)
+    @dmns.admit(@sally)
+
+    assert_equal [@bob, @sally], @dmns.patrons
+  end
+
+  def test_it_can_calculate_patrons_by_exhibit_interest
+    @dmns.add_exhibit(@gems_and_minerals)
+    @dmns.add_exhibit(@dead_sea_scrolls)
+    @dmns.add_exhibit(@imax)
+
+    @bob.add_interest("Dead Sea Scrolls")
+    @bob.add_interest("Gems and Minerals")
+    @sally.add_interest("Dead Sea Scrolls")
+
+    @dmns.admit(@bob)
+    @dmns.admit(@sally)
+
+    hash = {
+            @gems_and_minerals => [@bob],
+            @dead_sea_scrolls => [@bob, @sally],
+            @imax => []
+            }
+
+    assert_equal hash, @dmns.patrons_by_exhibit_interest
   end
 
 end
